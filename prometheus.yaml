@@ -1,0 +1,13 @@
+# prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+remote_write:
+  - url: "http://influxdb:8086/api/v2/prom/write?db=metrics"
+    remote_timeout: 30s
+
+scrape_configs:
+  - job_name: 'go-spring'
+    static_configs:
+      - targets: ['app:8080']
