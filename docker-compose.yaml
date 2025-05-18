@@ -1,0 +1,58 @@
+# docker-compose.yml
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - PROMETHEUS_MULTIPROC_DIR=/tmp
+    depends_on:
+      - postgres
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+  # Optional: Long-term storage
+  influxdb:
+    image: influxdb:1.8
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    ports:
+      - "8086:8086"
+
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: go_spring
+      POSTGRES_PASSWORD: go_spring_pass
+      POSTGRES_DB: go_spring_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U go_spring"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  influxdb_data:
+  postgres_data:

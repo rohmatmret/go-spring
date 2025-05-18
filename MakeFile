@@ -1,0 +1,50 @@
+# Makefile
+
+.PHONY: up down logs ps clean
+
+# Default target
+all: up
+
+# Start all services except app
+up:
+	docker-compose up -d prometheus grafana influxdb postgres
+
+# Stop all services
+down:
+	docker-compose down
+
+# View logs
+logs:
+	docker-compose logs -f prometheus grafana influxdb postgres
+
+# Show running containers
+ps:
+	docker-compose ps
+
+# Clean up volumes
+clean:
+	docker-compose down -v
+
+# Restart services
+restart:
+	docker-compose restart prometheus grafana influxdb postgres
+
+# Check service health
+health:
+	@echo "Checking service health..."
+	@docker-compose ps
+	@echo "\nPrometheus: http://localhost:9090"
+	@echo "Grafana: http://localhost:3000"
+	@echo "InfluxDB: http://localhost:8086"
+	@echo "PostgreSQL: localhost:5432"
+
+# Help
+help:
+	@echo "Available commands:"
+	@echo "  make up      - Start all services"
+	@echo "  make down    - Stop all services"
+	@echo "  make logs    - View service logs"
+	@echo "  make ps      - Show running containers"
+	@echo "  make clean   - Remove all containers and volumes"
+	@echo "  make restart - Restart all services"
+	@echo "  make health  - Check service health"
